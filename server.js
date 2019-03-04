@@ -6,6 +6,7 @@ var User = require('./Users');
 var jwt = require('jsonwebtoken');
 
 var app = express();
+module.exports = app; // for testing
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -65,7 +66,7 @@ router.post('/signup', function(req, res) {
                     return res.send(err);
             }
 
-            res.json({ message: 'User created!' });
+            res.json({ success: true, message: 'User created!' });
         });
     }
 });
