@@ -49,7 +49,7 @@ router.route('/users')
 
 router.post('/signup', function(req, res) {
     if (!req.body.username || !req.body.password) {
-        res.json({success: false, msg: 'Please pass username and password.'});
+        res.json({success: false, message: 'Please pass username and password.'});
     }
     else {
         var user = new User();
@@ -87,7 +87,7 @@ router.post('/signin', function(req, res) {
                 res.json({success: true, token: 'JWT ' + token});
             }
             else {
-                res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
+                res.status(401).send({success: false, message: 'Authentication failed.'});
             }
         });
 
