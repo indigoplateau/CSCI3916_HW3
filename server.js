@@ -4,9 +4,11 @@ var passport = require('passport');
 var authJwtController = require('./auth_jwt');
 var User = require('./Users');
 var jwt = require('jsonwebtoken');
+var cors = require('cors');
 
 var app = express();
 module.exports = app; // for testing
+app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -73,7 +75,7 @@ router.post('/signup', function(req, res) {
 
 router.post('/signin', function(req, res) {
     var userNew = new User();
-    userNew.name = req.body.name;
+    //userNew.name = req.body.name;
     userNew.username = req.body.username;
     userNew.password = req.body.password;
 
