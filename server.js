@@ -97,14 +97,17 @@ router.route('/movies')
             res.json({success: false, message: 'Error,  Empty fields.'});
         }
 
-        Movie.findOneAndDelete(req.body.title, function(err){
-            if(err){
-                res.send(err);
-            }
-            else{
-                res.json({ success: true, message: 'Movie Deleted.' });
-            }
-        });
+
+        Movie.findOneAndDelete({'title':req.body.title})
+            .then(deletedDocument => {
+                if(deletedDocument) {
+                    res.json({ success: true, message: 'Movie Deleted.' });
+                }
+                else {
+                    res.json({success: false, message: 'Error,  no matching movie found.'});
+                }
+            })
+            .catch(err => console.error(`Failed to find and delete movie: ${err}`))
 
     })
     .get(authJwtController.isAuthenticated, function (req, res) {
