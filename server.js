@@ -3,8 +3,10 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var authJwtController = require('./auth_jwt');
 var User = require('./Users');
+var Movie = require('./Movies');
 var jwt = require('jsonwebtoken');
 var cors = require('cors');
+
 
 var app = express();
 module.exports = app; // for testing
@@ -14,7 +16,110 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
 
+// hey
+
 var router = express.Router();
+
+router.route('/movies')
+    .post(authJwtController.isAuthenticated, function (req, res) {
+        console.log(req.body);
+        if (!req.body.title || !req.body.releaseDate || !req.body.genre) {
+            res.json({success: false, message: 'Error,  Empty fields.'});
+        }
+        else if(!req.body.actors[0] || !req.body.actors[1]|| !req.body.actors[2]){
+
+            res.json({success: false, message: 'Error,  Less than 3 actors.'});
+
+        }
+        else {
+            var movie = new Movie();
+            movie.title = req.body.title;
+            console.log(movie.title);
+            movie.releaseDate = req.body.releaseDate;
+            console.log(movie.releaseDate)
+            movie.genre = req.body.genre;
+            console.log(movie.genre);
+            movie.actors = req.body.actors;
+
+
+            // save the movie
+            movie.save(function(err) {
+
+                if (err) {
+
+                    console.log('Error Inserting New Data');
+                    if (err.name == 'ValidationError') {
+                        for (field in err.errors) {
+                            console.log(err.errors[field].message);
+                        }
+                    }
+                    // duplicate entry
+                    if (err.code == 11000)
+                        return res.json({ success: false, message: 'A Movie with that title already exists. '});
+                    else
+                        return res.send(err);
+                }
+
+                res.json({ success: true, message: 'Movie created.' });
+            });
+        }
+
+    })
+    .put(authJwtController.isAuthenticated, function (req, res) {
+        console.log(req.body);
+
+        if (!req.body.title || !req.body.s || !req.body.update) {
+            res.json({success: false, message: 'Error,  Empty fields.'});
+        }
+        var temp = req.body.s;
+        const filter = { title: req.body.title };
+        console.log(filter);
+        var update = req.body.s;
+        var args = {};
+        args[update] = req.body.update;
+        console.log(args);
+
+
+        Movie.findOneAndUpdate(filter, args, function(err, result) {
+            if (err) {
+                res.send(err);
+            }
+            else {
+                res.json({ success: true, message: 'Movie Updated.' });
+            }
+        });
+
+    })
+    .delete(authJwtController.isAuthenticated, function (req, res) {
+        console.log(req.body);
+
+        if (!req.body.title) {
+            res.json({success: false, message: 'Error,  Empty fields.'});
+        }
+
+        Movie.findOneAndDelete(req.body.title, function(err){
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.json({ success: true, message: 'Movie Deleted.' });
+            }
+        });
+
+    })
+    .get(authJwtController.isAuthenticated, function (req, res) {
+        console.log(req.body);
+
+        Movie.find(function (err, movie) {
+        if(err){
+            res.send(err);
+        }
+        else{
+            res.json(movie);
+        }
+        })
+
+    });
 
 router.route('/postjwt')
     .post(authJwtController.isAuthenticated, function (req, res) {
