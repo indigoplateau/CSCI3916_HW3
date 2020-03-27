@@ -10,7 +10,7 @@ var cors = require('cors');
 
 var app = express();
 module.exports = app; // for testing
-app.use(cors())
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
